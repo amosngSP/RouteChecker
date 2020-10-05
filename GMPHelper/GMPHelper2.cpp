@@ -30,10 +30,13 @@ const	int		TAG_ITEM_ROUTE_VALID = 123123;
 //const   int     TAG_FUNC_CTOT_MANUAL = 1;
 //const   int     TAG_FUNC_CTOT_ASSIGN = 2;
 
+
 //const   int     TAG_FUNC_CTOT_MANUAL_FINISH = 10;
 //const   int     TAG_FUNC_CTOT_ASSIGN_SEQ = 11;
 //const   int     TAG_FUNC_CTOT_ASSIGN_ASAP = 13;
+const   int     TAG_FUNC_ROUTING = 15;
 //const   int     TAG_FUNC_CTOT_CLEAR = 12341;
+
 const CTimeSpan taxitime = CTimeSpan(0, 0, 20, 0);
 std::unordered_map<std::string, RouteData> data;
 
@@ -83,8 +86,11 @@ CGMPHelper::CGMPHelper(void)
 	RegisterTagItemType("RouteValid", TAG_ITEM_ROUTE_VALID);
 
 	//Registering our two functions the first one opens a popup menu the second one lets the user enter a ctot manually
+
 	//RegisterTagItemFunction("Assign CTOT", TAG_FUNC_CTOT_ASSIGN);
 	//RegisterTagItemFunction("Edit CTOT", TAG_FUNC_CTOT_MANUAL);
+	RegisterTagItemFunction("Get routes", TAG_FUNC_ROUTING);
+
 
 	//Registering our list that is displayed in euroscope
 	//m_TOSequenceList = RegisterFpList("T/O Sequence List");
@@ -268,7 +274,7 @@ void CGMPHelper::OnGetTagItem(EuroScopePlugIn::CFlightPlan FlightPlan,
 		std::string status = FlightPlan.GetGroundState();
 		if (TOBT - curr < CTimeSpan(0, 0, 5, 0) && status.empty())
 		{
-			if (TOBT > curr)
+			if (TOBT + CTimeSpan(0,0,5,0) > curr)
 			{
 				*pColorCode = EuroScopePlugIn::TAG_COLOR_RGB_DEFINED;
 				*pRGB = RGB(255, 191, 0);
@@ -513,321 +519,361 @@ int     CGMPHelper::_SelectAcIndex(EuroScopePlugIn::CFlightPlan flightplan)
 	return -1;
 }
 
-//inline void CGMPHelper::OnFunctionCall(int FunctionId,	const char * sItemString,	POINT Pt,RECT Area)
-//{
-//	//handle our registered functions
-//	EuroScopePlugIn::CFlightPlan  fp;
-//	CString                         str;
-//
-//
-//	// get the flightplan we are dealing with
-//	fp = FlightPlanSelectASEL();
-//	if (!fp.IsValid())
-//		return;
-//
-//	// select it from the sequence
-//	int idx = _SelectAcIndex(fp);
-//	auto fpdata = fp.GetFlightPlanData();
-//	std::string dep = fpdata.GetOrigin();
-//
-//	// switch by the function ID
-//	switch (FunctionId)
-//	{
-//	case TAG_FUNC_CTOT_MANUAL: // TAG function
-//	{
-//
-//		// open a popup editor there
-//		OpenPopupEdit(Area,
-//			TAG_FUNC_CTOT_MANUAL_FINISH,
-//			"");
-//		break;
-//	}
-//	case TAG_FUNC_CTOT_MANUAL_FINISH: // when finished editing
-//	{
-//		//same thing as in getTagItem
-//		CTime temp;
-//		temp = CTime::GetCurrentTime();
-//		tm t, t1;
-//		temp.GetGmtTm(&t);
-//		temp.GetLocalTm(&t1);
-//		CTimeSpan diff = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec) - CTime(1900 + t1.tm_year, t1.tm_mon + 1, t1.tm_mday, t1.tm_hour, t1.tm_min, t1.tm_sec);
-//		//as our ctot we use the manually entered 4 digits
-//		int input = atoi(sItemString);
-//		int test = input - (input / 100) * 100;
-//		if (input >= 2400 || test >= 60) return;
-//		auto data = fp.GetFlightPlanData();
-//		auto remarks = data.GetRemarks();
-//		const char* test1 = NULL;
-//		std::string temp2 = remarks;
-//		test1 = strstr(remarks, "/CTOT");
-//		//if /CTOT is not present in the remarks we append it to it
-//		if (!test1)
-//		{
-//			std::string temp2;
-//			temp2 = remarks;
-//			temp2 += "/CTOT";
-//			data.SetRemarks(temp2.c_str());
-//			data.AmendFlightPlan();
-//		}
-//		// if the aircraft was in the sequence already we modify its CTOTData otherwise we make a new one
-//		if (idx >= 0)
-//		{
-//			if (dep == "OMDB")
-//			{
-//				try {
-//					m_sequence_OMDB[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
-//					m_sequence_OMDB[idx].TOBT = m_sequence_OMDB[idx].CTOT - taxitime;
-//					m_sequence_OMDB[idx].manual = true;
-//					std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
-//
-//				}
-//				catch (...)
-//				{
-//				}
-//			}
-//			if (dep == "OMSJ")
-//			{
-//				try {
-//					m_sequence_OMSJ[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
-//					m_sequence_OMSJ[idx].TOBT = m_sequence_OMSJ[idx].CTOT - taxitime;
-//					m_sequence_OMSJ[idx].manual = true;
-//					std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
-//
-//				}
-//				catch (...)
-//				{
-//				}
-//			}
-//			if (dep == "OMDW")
-//			{
-//				try {
-//					m_sequence_OMDW[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
-//					m_sequence_OMDW[idx].TOBT = m_sequence_OMDW[idx].CTOT - taxitime;
-//					m_sequence_OMDW[idx].manual = true;
-//					std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
-//
-//				}
-//				catch (...)
-//				{
-//				}
-//			}
-//			if (dep == "OMAA")
-//			{
-//				try {
-//					m_sequence_OMAA[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
-//					m_sequence_OMAA[idx].TOBT = m_sequence_OMAA[idx].CTOT - taxitime;
-//					m_sequence_OMAA[idx].manual = true;
-//					std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
-//
-//				}
-//				catch (...)
-//				{
-//				}
-//			}
-//		}
-//		else {
-//			CTOTData temp1;
-//			temp1.flightplan = fp;
-//			try {
-//				temp1.CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
-//				temp1.TOBT = temp1.CTOT - taxitime;
-//				temp1.manual = true;
-//				if (dep == "OMDB")
-//				{
-//					m_sequence_OMDB.push_back(temp1);
-//					std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
-//				}
-//				if (dep == "OMSJ")
-//				{
-//					m_sequence_OMSJ.push_back(temp1);
-//					std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
-//				}
-//				if (dep == "OMDW")
-//				{
-//					m_sequence_OMDW.push_back(temp1);
-//					std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
-//				}
-//				if (dep == "OMAA")
-//				{
-//					m_sequence_OMAA.push_back(temp1);
-//					std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
-//				}
-//			}
-//			catch (...)
-//			{
-//			}
-//		}
-//		// at last we modify the estimated departure time in the flightplan so other controller's plugin can parse the value themselves
-//		idx = _SelectAcIndex(fp);
-//		auto fpdata = fp.GetFlightPlanData();
-//		tm t2 = {0};
-//		if (dep == "OMDB")
-//			m_sequence_OMDB[idx].CTOT.GetGmtTm(&t2);
-//		if (dep == "OMSJ")
-//			m_sequence_OMSJ[idx].CTOT.GetGmtTm(&t2);
-//		if (dep == "OMDW")
-//			m_sequence_OMDW[idx].CTOT.GetGmtTm(&t2);
-//		if (dep == "OMAA")
-//			m_sequence_OMAA[idx].CTOT.GetGmtTm(&t2);
-//		CString cstring;
-//		cstring.Format("%.4d", t2.tm_hour * 100 + t2.tm_min);
-//		fpdata.SetEstimatedDepartureTime(cstring);
-//		fpdata.AmendFlightPlan();
-//		//we recalculate the CTOT for all aircraft in sequence after the manually assigned one
-//		break;
-//	}
-//	case TAG_FUNC_CTOT_ASSIGN: // TAG function
-//
-//		// start a popup list
-//		OpenPopupList(Area, "Assign CTOT", 1);
-//
-//
-//		AddPopupListElement("Assign in sequence", "", TAG_FUNC_CTOT_ASSIGN_SEQ);
-//		AddPopupListElement("Assign ASAP", "", TAG_FUNC_CTOT_ASSIGN_ASAP);
-//
-//
-//		// finally add a fixed element to clear the ctot
-//
-//		AddPopupListElement("Clear", "",
-//			TAG_FUNC_CTOT_CLEAR);
-//		break;
-//
-//	case TAG_FUNC_CTOT_ASSIGN_SEQ: // user selected assign in sequence
-//	{
-//		//dont assign if we already have assigned one. Safeguards against missclicks
-//		if (idx >= 0) return;
-//		// get the remarks and modify it
-//		auto data = fp.GetFlightPlanData();
-//		auto remarks = data.GetRemarks();
-//		const char* test = NULL;
-//		std::string temp = remarks;
-//		test = strstr(remarks, "/CTOT");
-//		if (!test)
-//		{
-//			std::string temp;
-//			temp = remarks;
-//			temp += "/CTOT";
-//			data.SetRemarks(temp.c_str());
-//			data.AmendFlightPlan();
-//		}
-//		CGMPHelper::assignCTOT(false, fp);
-//
-//		//again modify the estimated departure time in the flightplan
-//		idx = _SelectAcIndex(fp);
-//		auto fpdata = fp.GetFlightPlanData();
-//		std::string dep = fpdata.GetOrigin();
-//		tm t;
-//		if (dep == "OMDB")
-//			m_sequence_OMDB[idx].CTOT.GetGmtTm(&t);
-//		if (dep == "OMSJ")
-//			m_sequence_OMSJ[idx].CTOT.GetGmtTm(&t);
-//		if (dep == "OMDW")
-//			m_sequence_OMDW[idx].CTOT.GetGmtTm(&t);
-//		if (dep == "OMAA")
-//			m_sequence_OMAA[idx].CTOT.GetGmtTm(&t);
-//		CString cstring;
-//		cstring.Format("%.4d", t.tm_hour * 100 + t.tm_min);
-//		fpdata.SetEstimatedDepartureTime(cstring);
-//		fpdata.AmendFlightPlan();
-//		break;
-//	}
-//	case TAG_FUNC_CTOT_ASSIGN_ASAP: // user selected asap
-//	{
-//		//all is the same but we call assignCTOT with the asap flag
-//		if (idx >= 0) return;
-//		auto data = fp.GetFlightPlanData();
-//		auto remarks = data.GetRemarks();
-//		const char* test = NULL;
-//		std::string temp = remarks;
-//		test = strstr(remarks, "/CTOT");
-//		if (!test)
-//		{
-//			std::string temp;
-//			temp = remarks;
-//			temp += "/CTOT";
-//			data.SetRemarks(temp.c_str());
-//			data.AmendFlightPlan();
-//		}
-//		CGMPHelper::assignCTOT(true, fp);
-//		idx = _SelectAcIndex(fp);
-//		auto fpdata = fp.GetFlightPlanData();
-//		std::string dep = fpdata.GetOrigin();
-//		tm t;
-//		if (dep == "OMDB")
-//			m_sequence_OMDB[idx].CTOT.GetGmtTm(&t);
-//		if (dep == "OMSJ")
-//			m_sequence_OMSJ[idx].CTOT.GetGmtTm(&t);
-//		if (dep == "OMDW")
-//			m_sequence_OMDW[idx].CTOT.GetGmtTm(&t);
-//		if (dep == "OMAA")
-//			m_sequence_OMAA[idx].CTOT.GetGmtTm(&t);
-//		CString cstring;
-//		cstring.Format("%.4d", t.tm_hour * 100 + t.tm_min);
-//		fpdata.SetEstimatedDepartureTime(cstring);
-//		fpdata.AmendFlightPlan();
-//		break;
-//	}
-//	case TAG_FUNC_CTOT_CLEAR: // clear the ctot
-//
-//		// simply clear
-//		if (idx < 0) break;
-//		auto cadata = fp.GetFlightPlanData();
-//		std::string dep = cadata.GetOrigin();
-//		auto remarks = cadata.GetRemarks();
-//		const char* test = NULL;
-//		std::string temp = remarks;
-//		test = strstr(remarks, "/CTOT");
-//		if (test)
-//		{
-//			//find and replace /CTOT from scratchpad
-//			temp = std::regex_replace(temp, std::regex("\\/CTOT"), "");
-//			cadata.SetRemarks(temp.c_str());
-//			cadata.AmendFlightPlan();
-//		}
-//		if (dep == "OMDB")
-//			m_sequence_OMDB.erase(std::remove(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), m_sequence_OMDB.at(_SelectAcIndex(fp))), m_sequence_OMDB.end());
-//		if (dep == "OMSJ")
-//			m_sequence_OMSJ.erase(std::remove(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), m_sequence_OMSJ.at(_SelectAcIndex(fp))), m_sequence_OMSJ.end());
-//		if (dep == "OMDW")
-//			m_sequence_OMDW.erase(std::remove(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), m_sequence_OMDW.at(_SelectAcIndex(fp))), m_sequence_OMDW.end());
-//		if (dep == "OMAA")
-//			m_sequence_OMAA.erase(std::remove(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), m_sequence_OMAA.at(_SelectAcIndex(fp))), m_sequence_OMAA.end());
-//		m_TOSequenceList.RemoveFpFromTheList(fp);
-//		updateListOMDB();
-//		updateListOMSJ();
-//		updateListOMDW();
-//		updateListOMAA();
-//		if (dep == "OMDB")
-//		{
-//			if (m_sequence_OMDB.size() == idx) break;
-//			if (idx == 0) recalculateCTOT(*m_sequence_OMDB.begin());
-//			else recalculateCTOT(m_sequence_OMDB[idx - 1]);
-//			break;
-//		}
-//		if (dep == "OMSJ")
-//		{
-//			if (m_sequence_OMSJ.size() == idx) break;
-//			if (idx == 0) recalculateCTOT(*m_sequence_OMSJ.begin());
-//			else recalculateCTOT(m_sequence_OMSJ[idx - 1]);
-//			break;
-//		}
-//		if (dep == "OMDW")
-//		{
-//			if (m_sequence_OMDW.size() == idx) break;
-//			if (idx == 0) recalculateCTOT(*m_sequence_OMDW.begin());
-//			else recalculateCTOT(m_sequence_OMDW[idx - 1]);
-//			break;
-//		}
-//		if (dep == "OMAA")
-//		{
-//			if (m_sequence_OMAA.size() == idx) break;
-//			if (idx == 0) recalculateCTOT(*m_sequence_OMAA.begin());
-//			else recalculateCTOT(m_sequence_OMAA[idx - 1]);
-//			break;
-//		}
-//
-//	}// switch by the function ID
-//}
+
+inline void CGMPHelper::OnFunctionCall(int FunctionId,	const char * sItemString,	POINT Pt,RECT Area)
+{
+	//handle our registered functions
+	EuroScopePlugIn::CFlightPlan  fp;
+	CString                         str;
+
+
+	// get the flightplan we are dealing with
+	fp = FlightPlanSelectASEL();
+	if (!fp.IsValid())
+		return;
+
+	// select it from the sequence
+	int idx = _SelectAcIndex(fp);
+	auto fpdata = fp.GetFlightPlanData();
+	std::string dep = fpdata.GetOrigin();
+
+	// switch by the function ID
+	switch (FunctionId)
+	{
+	// case TAG_FUNC_CTOT_MANUAL: // TAG function
+	// {
+
+		// // open a popup editor there
+		// OpenPopupEdit(Area,
+			// TAG_FUNC_CTOT_MANUAL_FINISH,
+			// "");
+		// break;
+	// }
+	// case TAG_FUNC_CTOT_MANUAL_FINISH: // when finished editing
+	// {
+		// //same thing as in getTagItem
+		// CTime temp;
+		// temp = CTime::GetCurrentTime();
+		// tm t, t1;
+		// temp.GetGmtTm(&t);
+		// temp.GetLocalTm(&t1);
+		// CTimeSpan diff = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec) - CTime(1900 + t1.tm_year, t1.tm_mon + 1, t1.tm_mday, t1.tm_hour, t1.tm_min, t1.tm_sec);
+		// //as our ctot we use the manually entered 4 digits
+		// int input = atoi(sItemString);
+		// int test = input - (input / 100) * 100;
+		// if (input >= 2400 || test >= 60) return;
+		// auto data = fp.GetFlightPlanData();
+		// auto remarks = data.GetRemarks();
+		// const char* test1 = NULL;
+		// std::string temp2 = remarks;
+		// test1 = strstr(remarks, "/CTOT");
+		// //if /CTOT is not present in the remarks we append it to it
+		// if (!test1)
+		// {
+			// std::string temp2;
+			// temp2 = remarks;
+			// temp2 += "/CTOT";
+			// data.SetRemarks(temp2.c_str());
+			// data.AmendFlightPlan();
+		// }
+		// // if the aircraft was in the sequence already we modify its CTOTData otherwise we make a new one
+		// if (idx >= 0)
+		// {
+			// if (dep == "OMDB")
+			// {
+				// try {
+					// m_sequence_OMDB[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
+					// m_sequence_OMDB[idx].TOBT = m_sequence_OMDB[idx].CTOT - taxitime;
+					// m_sequence_OMDB[idx].manual = true;
+					// std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
+
+				// }
+				// catch (...)
+				// {
+				// }
+			// }
+			// if (dep == "OMSJ")
+			// {
+				// try {
+					// m_sequence_OMSJ[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
+					// m_sequence_OMSJ[idx].TOBT = m_sequence_OMSJ[idx].CTOT - taxitime;
+					// m_sequence_OMSJ[idx].manual = true;
+					// std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
+
+				// }
+				// catch (...)
+				// {
+				// }
+			// }
+			// if (dep == "OMDW")
+			// {
+				// try {
+					// m_sequence_OMDW[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
+					// m_sequence_OMDW[idx].TOBT = m_sequence_OMDW[idx].CTOT - taxitime;
+					// m_sequence_OMDW[idx].manual = true;
+					// std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
+
+				// }
+				// catch (...)
+				// {
+				// }
+			// }
+			// if (dep == "OMAA")
+			// {
+				// try {
+					// m_sequence_OMAA[idx].CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
+					// m_sequence_OMAA[idx].TOBT = m_sequence_OMAA[idx].CTOT - taxitime;
+					// m_sequence_OMAA[idx].manual = true;
+					// std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
+
+				// }
+				// catch (...)
+				// {
+				// }
+			// }
+		// }
+		// else {
+			// CTOTData temp1;
+			// temp1.flightplan = fp;
+			// try {
+				// temp1.CTOT = CTime(1900 + t.tm_year, t.tm_mon + 1, t.tm_mday, input / 100, input - (input / 100) * 100, 0) - diff;
+				// temp1.TOBT = temp1.CTOT - taxitime;
+				// temp1.manual = true;
+				// if (dep == "OMDB")
+				// {
+					// m_sequence_OMDB.push_back(temp1);
+					// std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
+				// }
+				// if (dep == "OMSJ")
+				// {
+					// m_sequence_OMSJ.push_back(temp1);
+					// std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
+				// }
+				// if (dep == "OMDW")
+				// {
+					// m_sequence_OMDW.push_back(temp1);
+					// std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
+				// }
+				// if (dep == "OMAA")
+				// {
+					// m_sequence_OMAA.push_back(temp1);
+					// std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
+				// }
+			// }
+			// catch (...)
+			// {
+			// }
+		// }
+		// // at last we modify the estimated departure time in the flightplan so other controller's plugin can parse the value themselves
+		// idx = _SelectAcIndex(fp);
+		// auto fpdata = fp.GetFlightPlanData();
+		// tm t2 = {0};
+		// if (dep == "OMDB")
+			// m_sequence_OMDB[idx].CTOT.GetGmtTm(&t2);
+		// if (dep == "OMSJ")
+			// m_sequence_OMSJ[idx].CTOT.GetGmtTm(&t2);
+		// if (dep == "OMDW")
+			// m_sequence_OMDW[idx].CTOT.GetGmtTm(&t2);
+		// if (dep == "OMAA")
+			// m_sequence_OMAA[idx].CTOT.GetGmtTm(&t2);
+		// CString cstring;
+		// cstring.Format("%.4d", t2.tm_hour * 100 + t2.tm_min);
+		// fpdata.SetEstimatedDepartureTime(cstring);
+		// fpdata.AmendFlightPlan();
+		// //we recalculate the CTOT for all aircraft in sequence after the manually assigned one
+		// break;
+	// }
+	// case TAG_FUNC_CTOT_ASSIGN: // TAG function
+	// {
+		// // start a popup list
+		// OpenPopupList(Area, "Assign CTOT", 1);
+
+
+		// AddPopupListElement("Assign in sequence", "", TAG_FUNC_CTOT_ASSIGN_SEQ);
+		// AddPopupListElement("Assign ASAP", "", TAG_FUNC_CTOT_ASSIGN_ASAP);
+
+
+		// // finally add a fixed element to clear the ctot
+
+		// AddPopupListElement("Clear", "",
+			// TAG_FUNC_CTOT_CLEAR);
+		// break;
+	// }
+	// case TAG_FUNC_CTOT_ASSIGN_SEQ: // user selected assign in sequence
+	// {
+		// //dont assign if we already have assigned one. Safeguards against missclicks
+		// if (idx >= 0) return;
+		// // get the remarks and modify it
+		// auto data = fp.GetFlightPlanData();
+		// auto remarks = data.GetRemarks();
+		// const char* test = NULL;
+		// std::string temp = remarks;
+		// test = strstr(remarks, "/CTOT");
+		// if (!test)
+		// {
+			// std::string temp;
+			// temp = remarks;
+			// temp += "/CTOT";
+			// data.SetRemarks(temp.c_str());
+			// data.AmendFlightPlan();
+		// }
+		// CGMPHelper::assignCTOT(false, fp);
+
+		// //again modify the estimated departure time in the flightplan
+		// idx = _SelectAcIndex(fp);
+		// auto fpdata = fp.GetFlightPlanData();
+		// std::string dep = fpdata.GetOrigin();
+		// tm t;
+		// if (dep == "OMDB")
+			// m_sequence_OMDB[idx].CTOT.GetGmtTm(&t);
+		// if (dep == "OMSJ")
+			// m_sequence_OMSJ[idx].CTOT.GetGmtTm(&t);
+		// if (dep == "OMDW")
+			// m_sequence_OMDW[idx].CTOT.GetGmtTm(&t);
+		// if (dep == "OMAA")
+			// m_sequence_OMAA[idx].CTOT.GetGmtTm(&t);
+		// CString cstring;
+		// cstring.Format("%.4d", t.tm_hour * 100 + t.tm_min);
+		// fpdata.SetEstimatedDepartureTime(cstring);
+		// fpdata.AmendFlightPlan();
+		// break;
+	// }
+	// case TAG_FUNC_CTOT_ASSIGN_ASAP: // user selected asap
+	// {
+		// //all is the same but we call assignCTOT with the asap flag
+		// if (idx >= 0) return;
+		// auto data = fp.GetFlightPlanData();
+		// auto remarks = data.GetRemarks();
+		// const char* test = NULL;
+		// std::string temp = remarks;
+		// test = strstr(remarks, "/CTOT");
+		// if (!test)
+		// {
+			// std::string temp;
+			// temp = remarks;
+			// temp += "/CTOT";
+			// data.SetRemarks(temp.c_str());
+			// data.AmendFlightPlan();
+		// }
+		// CGMPHelper::assignCTOT(true, fp);
+		// idx = _SelectAcIndex(fp);
+		// auto fpdata = fp.GetFlightPlanData();
+		// std::string dep = fpdata.GetOrigin();
+		// tm t;
+		// if (dep == "OMDB")
+			// m_sequence_OMDB[idx].CTOT.GetGmtTm(&t);
+		// if (dep == "OMSJ")
+			// m_sequence_OMSJ[idx].CTOT.GetGmtTm(&t);
+		// if (dep == "OMDW")
+			// m_sequence_OMDW[idx].CTOT.GetGmtTm(&t);
+		// if (dep == "OMAA")
+			// m_sequence_OMAA[idx].CTOT.GetGmtTm(&t);
+		// CString cstring;
+		// cstring.Format("%.4d", t.tm_hour * 100 + t.tm_min);
+		// fpdata.SetEstimatedDepartureTime(cstring);
+		// fpdata.AmendFlightPlan();
+		// break;
+	// }
+	// case TAG_FUNC_CTOT_CLEAR: // clear the ctot
+	// {
+		// // simply clear
+		// if (idx < 0) break;
+		// auto cadata = fp.GetFlightPlanData();
+		// std::string dep = cadata.GetOrigin();
+		// auto remarks = cadata.GetRemarks();
+		// const char* test = NULL;
+		// std::string temp = remarks;
+		// test = strstr(remarks, "/CTOT");
+		// if (test)
+		// {
+			// //find and replace /CTOT from scratchpad
+			// temp = std::regex_replace(temp, std::regex("\\/CTOT"), "");
+			// cadata.SetRemarks(temp.c_str());
+			// cadata.AmendFlightPlan();
+		// }
+		// if (dep == "OMDB")
+			// m_sequence_OMDB.erase(std::remove(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), m_sequence_OMDB.at(_SelectAcIndex(fp))), m_sequence_OMDB.end());
+		// if (dep == "OMSJ")
+			// m_sequence_OMSJ.erase(std::remove(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), m_sequence_OMSJ.at(_SelectAcIndex(fp))), m_sequence_OMSJ.end());
+		// if (dep == "OMDW")
+			// m_sequence_OMDW.erase(std::remove(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), m_sequence_OMDW.at(_SelectAcIndex(fp))), m_sequence_OMDW.end());
+		// if (dep == "OMAA")
+			// m_sequence_OMAA.erase(std::remove(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), m_sequence_OMAA.at(_SelectAcIndex(fp))), m_sequence_OMAA.end());
+		// m_TOSequenceList.RemoveFpFromTheList(fp);
+		// updateListOMDB();
+		// updateListOMSJ();
+		// updateListOMDW();
+		// updateListOMAA();
+		// if (dep == "OMDB")
+		// {
+			// if (m_sequence_OMDB.size() == idx) break;
+			// if (idx == 0) recalculateCTOT(*m_sequence_OMDB.begin());
+			// else recalculateCTOT(m_sequence_OMDB[idx - 1]);
+			// break;
+		// }
+		// if (dep == "OMSJ")
+		// {
+			// if (m_sequence_OMSJ.size() == idx) break;
+			// if (idx == 0) recalculateCTOT(*m_sequence_OMSJ.begin());
+			// else recalculateCTOT(m_sequence_OMSJ[idx - 1]);
+			// break;
+		// }
+		// if (dep == "OMDW")
+		// {
+			// if (m_sequence_OMDW.size() == idx) break;
+			// if (idx == 0) recalculateCTOT(*m_sequence_OMDW.begin());
+			// else recalculateCTOT(m_sequence_OMDW[idx - 1]);
+			// break;
+		// }
+		// if (dep == "OMAA")
+		// {
+			// if (m_sequence_OMAA.size() == idx) break;
+			// if (idx == 0) recalculateCTOT(*m_sequence_OMAA.begin());
+			// else recalculateCTOT(m_sequence_OMAA[idx - 1]);
+			// break;
+		// }
+	// }
+	case TAG_FUNC_ROUTING:
+	{
+		std::string handlername = "Route for ";
+		handlername += fp.GetCallsign();
+		std::string dest = fpdata.GetDestination();
+		auto routes = data[fpdata.GetOrigin()].getDatafromICAO(dest);
+		if (routes.empty())
+		{
+			routes = data[fpdata.GetOrigin()].getDatafromICAO(dest.substr(0, 2));
+			if (routes.empty())
+			{
+				routes = data[fpdata.GetOrigin()].getDatafromICAO(dest.substr(0, 1));
+				if(routes.empty())
+					DisplayUserMessage(handlername.c_str(), "", "No route found", true, true, true, true, true);
+			}
+			
+		}
+		for (auto temp : routes)
+		{
+			std::string routing = "Valid routes to ";
+			routing += dest;
+			routing += ": ";
+			routing += temp.mRoute;
+			routing += ". Flightlevel is ";
+			if (temp.mLevelR.empty())
+				routing += "not restricted";
+			else
+			{
+				routing += "restricted to ";
+				routing += temp.mLevelR;
+			}
+			routing += ". The direction of flight dictates an ";
+			routing += temp.mEvenOdd;
+			routing += " cruise level.";
+			DisplayUserMessage(handlername.c_str(), "", routing.c_str(), true, true, true, true, true);
+		}
+	}
+
+	}// switch by the function ID
+}
+
 
 void CGMPHelper::assignCTOT(bool asap, EuroScopePlugIn::CFlightPlan flightplan)
 {
