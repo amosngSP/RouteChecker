@@ -874,558 +874,558 @@ inline void CGMPHelper::OnFunctionCall(int FunctionId,	const char * sItemString,
 	}// switch by the function ID
 }
 
-
-void CGMPHelper::assignCTOT(bool asap, EuroScopePlugIn::CFlightPlan flightplan)
-{
-	CTime time = CTime::GetCurrentTime();
-	CTime ctot;
-	CTime tobt;
-	CTOTData temp;
-	auto cadata = flightplan.GetFlightPlanData();
-	std::string dep = cadata.GetOrigin();
-	//if there is none in sequence or we want asap we dont care about separation
-	if (dep == "OMDB")
-	{
-		if (m_sequence_OMDB.empty() || asap)
-		{
-
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			ctot = time + CTimeSpan(0, 0, 30, 0);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-		}
-		else
-		{
-			//get the last aircraft in sequence
-			CTOTData &end = *(m_sequence_OMDB.end() - 1);
-			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			//assign at earliest 30 minutes after now 
-			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-
-		}
-
-		m_sequence_OMDB.push_back(temp);
-		std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
-		if (asap)
-		{
-			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMDB.at(ind - 1));
-			else recalculateCTOT(*(m_sequence_OMDB.begin()));
-
-		}
-	}
-	if (dep == "OMSJ")
-	{
-		if (m_sequence_OMSJ.empty() || asap)
-		{
-
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			ctot = time + CTimeSpan(0, 0, 30, 0);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-		}
-		else
-		{
-			//get the last aircraft in sequence
-			CTOTData &end = *(m_sequence_OMSJ.end() - 1);
-			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			//assign at earliest 30 minutes after now 
-			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-
-		}
-
-		m_sequence_OMSJ.push_back(temp);
-		std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
-		if (asap)
-		{
-			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMSJ.at(ind - 1));
-			else recalculateCTOT(*(m_sequence_OMSJ.begin()));
-
-		}
-	}
-	if (dep == "OMDW")
-	{
-		if (m_sequence_OMDW.empty() || asap)
-		{
-
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			ctot = time + CTimeSpan(0, 0, 30, 0);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-		}
-		else
-		{
-			//get the last aircraft in sequence
-			CTOTData &end = *(m_sequence_OMDW.end() - 1);
-			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			//assign at earliest 30 minutes after now 
-			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-
-		}
-
-		m_sequence_OMDW.push_back(temp);
-		std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
-		if (asap)
-		{
-			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMDW.at(ind - 1));
-			else recalculateCTOT(*(m_sequence_OMDW.begin()));
-
-		}
-	}
-	if (dep == "OMAA")
-	{
-		if (m_sequence_OMAA.empty() || asap)
-		{
-
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			ctot = time + CTimeSpan(0, 0, 30, 0);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-		}
-		else
-		{
-			//get the last aircraft in sequence
-			CTOTData &end = *(m_sequence_OMAA.end() - 1);
-			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
-			temp.flightplan = flightplan;
-			temp.sequence = -1;
-			//assign at earliest 30 minutes after now 
-			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
-			tobt = ctot - taxitime;
-			temp.CTOT = ctot;
-			temp.TOBT = tobt;
-
-
-		}
-
-		m_sequence_OMAA.push_back(temp);
-		std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
-		if (asap)
-		{
-			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMAA.at(ind - 1));
-			else recalculateCTOT(*(m_sequence_OMAA.begin()));
-
-		}
-	}
-}
-void CGMPHelper::updateListOMDB()
-{
-	//some housekeeping 
-	for (CTOTData i : m_sequence_OMDB)
-	{
-		//add all aircraft in sequence to the euroscope list
-		m_TOSequenceList.AddFpToTheList(i.flightplan);
-	}
-	for (CTOTData i : m_sequence_OMDB)
-	{
-		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
-		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
-		bool found = false;
-		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
-		while (temp.IsValid() && !found)
-		{
-			if (temp.GetCallsign() == i.flightplan.GetCallsign())
-			{
-				found = true;
-				break;
-			}
-			temp = FlightPlanSelectNext(temp);
-		}
-		if (!found)
-		{
-			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
-			m_sequence_OMDB.erase(std::remove(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), m_sequence_OMDB.at(_SelectAcIndex(i.flightplan))), m_sequence_OMDB.end());
-			continue;
-		}
-		
-		
-		//if any aircraft takes off remove it automatically
-		auto fp = i.flightplan;
-		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
-		auto cad = fp.GetFlightPlanData();
-		std::string remarks = cad.GetRemarks();
-		const char* test = NULL;
-		test = strstr(remarks.c_str(), "/CTOT");
-		if (rt.GetGS() > 80||!test)
-		{
-			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
-			cad.SetRemarks(remarks.c_str());
-			cad.AmendFlightPlan();
-			m_TOSequenceList.RemoveFpFromTheList(fp);
-			m_sequence_OMDB.erase(std::remove(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), m_sequence_OMDB.at(_SelectAcIndex(fp))), m_sequence_OMDB.end());
-		}
-	}
-	std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
-	for (CTOTData &i : m_sequence_OMDB)
-	{
-		//get the number in sequence for everyone
-		i.sequence = _SelectAcIndex(i.flightplan) + 1;
-	}
-	if (m_sequence_OMDB.empty())
-	{
-		return;
-	}
-	recalculateCTOT(*m_sequence_OMDB.begin());
-}
-void CGMPHelper::updateListOMSJ()
-{
-	//some housekeeping 
-	for (CTOTData i : m_sequence_OMSJ)
-	{
-		//add all aircraft in sequence to the euroscope list
-		m_TOSequenceList.AddFpToTheList(i.flightplan);
-	}
-	for (CTOTData i : m_sequence_OMSJ)
-	{
-		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
-		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
-		bool found = false;
-		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
-		while (temp.IsValid() && !found)
-		{
-			if (temp.GetCallsign() == i.flightplan.GetCallsign())
-			{
-				found = true;
-				break;
-			}
-			temp = FlightPlanSelectNext(temp);
-		}
-		if (!found)
-		{
-			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
-			m_sequence_OMSJ.erase(std::remove(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), m_sequence_OMSJ.at(_SelectAcIndex(i.flightplan))), m_sequence_OMSJ.end());
-			continue;
-		}
-
-
-		//if any aircraft takes off remove it automatically
-		auto fp = i.flightplan;
-		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
-		auto cad = fp.GetFlightPlanData();
-		std::string remarks = cad.GetRemarks();
-		const char* test = NULL;
-		test = strstr(remarks.c_str(), "/CTOT");
-		if (rt.GetGS() > 80 || !test)
-		{
-			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
-			cad.SetRemarks(remarks.c_str());
-			cad.AmendFlightPlan();
-			m_TOSequenceList.RemoveFpFromTheList(fp);
-			m_sequence_OMSJ.erase(std::remove(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), m_sequence_OMSJ.at(_SelectAcIndex(fp))), m_sequence_OMSJ.end());
-		}
-	}
-	std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
-	for (CTOTData &i : m_sequence_OMSJ)
-	{
-		//get the number in sequence for everyone
-		i.sequence = _SelectAcIndex(i.flightplan) + 1;
-	}
-	if (m_sequence_OMSJ.empty())
-	{
-		return;
-	}
-	recalculateCTOT(*m_sequence_OMSJ.begin());
-}
-void CGMPHelper::updateListOMDW()
-{
-	//some housekeeping 
-	for (CTOTData i : m_sequence_OMDW)
-	{
-		//add all aircraft in sequence to the euroscope list
-		m_TOSequenceList.AddFpToTheList(i.flightplan);
-	}
-	for (CTOTData i : m_sequence_OMDW)
-	{
-		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
-		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
-		bool found = false;
-		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
-		while (temp.IsValid() && !found)
-		{
-			if (temp.GetCallsign() == i.flightplan.GetCallsign())
-			{
-				found = true;
-				break;
-			}
-			temp = FlightPlanSelectNext(temp);
-		}
-		if (!found)
-		{
-			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
-			m_sequence_OMDW.erase(std::remove(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), m_sequence_OMDW.at(_SelectAcIndex(i.flightplan))), m_sequence_OMDW.end());
-			continue;
-		}
-
-
-		//if any aircraft takes off remove it automatically
-		auto fp = i.flightplan;
-		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
-		auto cad = fp.GetFlightPlanData();
-		std::string remarks = cad.GetRemarks();
-		const char* test = NULL;
-		test = strstr(remarks.c_str(), "/CTOT");
-		if (rt.GetGS() > 80 || !test)
-		{
-			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
-			cad.SetRemarks(remarks.c_str());
-			cad.AmendFlightPlan();
-			m_TOSequenceList.RemoveFpFromTheList(fp);
-			m_sequence_OMDW.erase(std::remove(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), m_sequence_OMDW.at(_SelectAcIndex(fp))), m_sequence_OMDW.end());
-		}
-	}
-	std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
-	for (CTOTData &i : m_sequence_OMDW)
-	{
-		//get the number in sequence for everyone
-		i.sequence = _SelectAcIndex(i.flightplan) + 1;
-	}
-	if (m_sequence_OMDW.empty())
-	{
-		return;
-	}
-	recalculateCTOT(*m_sequence_OMDW.begin());
-}
-void CGMPHelper::updateListOMAA()
-{
-	//some housekeeping 
-	for (CTOTData i : m_sequence_OMAA)
-	{
-		//add all aircraft in sequence to the euroscope list
-		m_TOSequenceList.AddFpToTheList(i.flightplan);
-	}
-	for (CTOTData i : m_sequence_OMAA)
-	{
-		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
-		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
-		bool found = false;
-		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
-		while (temp.IsValid() && !found)
-		{
-			if (temp.GetCallsign() == i.flightplan.GetCallsign())
-			{
-				found = true;
-				break;
-			}
-			temp = FlightPlanSelectNext(temp);
-		}
-		if (!found)
-		{
-			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
-			m_sequence_OMAA.erase(std::remove(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), m_sequence_OMAA.at(_SelectAcIndex(i.flightplan))), m_sequence_OMAA.end());
-			continue;
-		}
-
-
-		//if any aircraft takes off remove it automatically
-		auto fp = i.flightplan;
-		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
-		auto cad = fp.GetFlightPlanData();
-		std::string remarks = cad.GetRemarks();
-		const char* test = NULL;
-		test = strstr(remarks.c_str(), "/CTOT");
-		if (rt.GetGS() > 80 || !test)
-		{
-			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
-			cad.SetRemarks(remarks.c_str());
-			cad.AmendFlightPlan();
-			m_TOSequenceList.RemoveFpFromTheList(fp);
-			m_sequence_OMAA.erase(std::remove(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), m_sequence_OMAA.at(_SelectAcIndex(fp))), m_sequence_OMAA.end());
-		}
-	}
-	std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
-	for (CTOTData &i : m_sequence_OMAA)
-	{
-		//get the number in sequence for everyone
-		i.sequence = _SelectAcIndex(i.flightplan) + 1;
-	}
-	if (m_sequence_OMAA.empty())
-	{
-		return;
-	}
-	recalculateCTOT(*m_sequence_OMAA.begin());
-}
-
-void CGMPHelper::recalculateCTOT(CTOTData inserted)
-//recalculates the CTOT for each flightplan in sequence following and inculding "inserted"
-{
-	std::string dep = inserted.flightplan.GetFlightPlanData().GetOrigin();
-	//get the number in sequence for our inserted fp
-	if (dep == "OMDB")
-	{
-		auto pos = std::find(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), inserted);
-		//safeguard if not found due to whatever 
-		if (pos == m_sequence_OMDB.end())
-		{
-			return;
-		}
-		//iterate over the sequence starting from "inserted"
-		for (auto &it = pos; it != m_sequence_OMDB.end() - 1; it++)
-		{
-			CTime curr = CTime::GetCurrentTime();
-			CTOTData temp1 = *it;
-			CString test = temp1.flightplan.GetCallsign();
-			CTOTData &temp2 = *(it + 1);
-			CString test2 = temp2.flightplan.GetCallsign();
-			if (temp2.manual) continue;
-			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
-			temp2.CTOT = std::max(temp2.CTOT,temp1.CTOT + inc);
-			temp2.TOBT = temp2.CTOT - taxitime;
-		}
-	}
-	if (dep == "OMSJ")
-	{
-		auto pos = std::find(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), inserted);
-		//safeguard if not found due to whatever 
-		if (pos == m_sequence_OMSJ.end())
-		{
-			return;
-		}
-		//iterate over the sequence starting from "inserted"
-		for (auto &it = pos; it != m_sequence_OMSJ.end() - 1; it++)
-		{
-			CTime curr = CTime::GetCurrentTime();
-			CTOTData temp1 = *it;
-			CString test = temp1.flightplan.GetCallsign();
-			CTOTData &temp2 = *(it + 1);
-			CString test2 = temp2.flightplan.GetCallsign();
-			if (temp2.manual) continue;
-			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
-			temp2.CTOT = std::max(temp2.CTOT, temp1.CTOT + inc);
-			temp2.TOBT = temp2.CTOT - taxitime;
-		}
-	}
-	if (dep == "OMDW")
-	{
-		auto pos = std::find(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), inserted);
-		//safeguard if not found due to whatever 
-		if (pos == m_sequence_OMDW.end())
-		{
-			return;
-		}
-		//iterate over the sequence starting from "inserted"
-		for (auto &it = pos; it != m_sequence_OMDW.end() - 1; it++)
-		{
-			CTime curr = CTime::GetCurrentTime();
-			CTOTData temp1 = *it;
-			CString test = temp1.flightplan.GetCallsign();
-			CTOTData &temp2 = *(it + 1);
-			CString test2 = temp2.flightplan.GetCallsign();
-			if (temp2.manual) continue;
-			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
-			temp2.CTOT = std::max(temp2.CTOT, temp1.CTOT + inc);
-			temp2.TOBT = temp2.CTOT - taxitime;
-		}
-	}
-	if (dep == "OMAA")
-	{
-		auto pos = std::find(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), inserted);
-		//safeguard if not found due to whatever 
-		if (pos == m_sequence_OMAA.end())
-		{
-			return;
-		}
-		//iterate over the sequence starting from "inserted"
-		for (auto &it = pos; it != m_sequence_OMAA.end() - 1; it++)
-		{
-			CTime curr = CTime::GetCurrentTime();
-			CTOTData temp1 = *it;
-			CString test = temp1.flightplan.GetCallsign();
-			CTOTData &temp2 = *(it + 1);
-			CString test2 = temp2.flightplan.GetCallsign();
-			if (temp2.manual) continue;
-			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
-			temp2.CTOT = std::max(temp2.CTOT, temp1.CTOT + inc);
-			temp2.TOBT = temp2.CTOT - taxitime;
-		}
-	}
-}
-CTimeSpan CGMPHelper::getIncrement(EuroScopePlugIn::CFlightPlan fp1, EuroScopePlugIn::CFlightPlan fp2)
-//returns the required difference in CTOT when fp2 is trailing fp1
-{
-	CTimeSpan increment;
-	CString sid1 = fp1.GetFlightPlanData().GetSidName();
-	CString sid2 = fp2.GetFlightPlanData().GetSidName();
-	char wtc1 = fp1.GetFlightPlanData().GetAircraftWtc();
-	char wtc2 = fp2.GetFlightPlanData().GetAircraftWtc();
-	switch (wtc1)
-	{
-	case 'J':
-	{
-		if (wtc2 == 'H')
-		{
-			increment = CTimeSpan(0, 0, 2, 0);
-		}
-		if (wtc2 == 'M' || wtc2 == 'L')
-		{
-			increment = CTimeSpan(0, 0, 3, 0);
-		}
-		break;
-	}
-	case 'H':
-	{
-		if (wtc2 == 'M' || wtc2 == 'L')
-		{
-			increment = CTimeSpan(0, 0, 2, 0);
-		}
-		else {
-
-		}
-		break;
-	}
-	case 'M':
-	{
-		if (wtc2 == 'L')
-		{
-			increment = CTimeSpan(0, 0, 2, 0);
-		}
-		break;
-	}
-	}
-	if (increment == NULL)
-	{
-		if (sid1 != sid2)
-		{
-			//RRSM
-			increment = CTimeSpan(0, 0, 1, 0);
-		}
-		else
-			increment = CTimeSpan(0, 0, 2, 0);
-	}
-	if (sid1 == sid2 && (strstr(sid1, "ANVIX") || strstr(sid1, "IVURO")))
-		increment = std::max(increment, CTimeSpan(0, 0, 3, 0));
-
-	return increment;
-}
-
+//
+//void CGMPHelper::assignCTOT(bool asap, EuroScopePlugIn::CFlightPlan flightplan)
+//{
+//	CTime time = CTime::GetCurrentTime();
+//	CTime ctot;
+//	CTime tobt;
+//	CTOTData temp;
+//	auto cadata = flightplan.GetFlightPlanData();
+//	std::string dep = cadata.GetOrigin();
+//	//if there is none in sequence or we want asap we dont care about separation
+//	if (dep == "OMDB")
+//	{
+//		if (m_sequence_OMDB.empty() || asap)
+//		{
+//
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			ctot = time + CTimeSpan(0, 0, 30, 0);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//		}
+//		else
+//		{
+//			//get the last aircraft in sequence
+//			CTOTData &end = *(m_sequence_OMDB.end() - 1);
+//			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			//assign at earliest 30 minutes after now 
+//			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//
+//		}
+//
+//		m_sequence_OMDB.push_back(temp);
+//		std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
+//		if (asap)
+//		{
+//			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMDB.at(ind - 1));
+//			else recalculateCTOT(*(m_sequence_OMDB.begin()));
+//
+//		}
+//	}
+//	if (dep == "OMSJ")
+//	{
+//		if (m_sequence_OMSJ.empty() || asap)
+//		{
+//
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			ctot = time + CTimeSpan(0, 0, 30, 0);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//		}
+//		else
+//		{
+//			//get the last aircraft in sequence
+//			CTOTData &end = *(m_sequence_OMSJ.end() - 1);
+//			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			//assign at earliest 30 minutes after now 
+//			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//
+//		}
+//
+//		m_sequence_OMSJ.push_back(temp);
+//		std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
+//		if (asap)
+//		{
+//			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMSJ.at(ind - 1));
+//			else recalculateCTOT(*(m_sequence_OMSJ.begin()));
+//
+//		}
+//	}
+//	if (dep == "OMDW")
+//	{
+//		if (m_sequence_OMDW.empty() || asap)
+//		{
+//
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			ctot = time + CTimeSpan(0, 0, 30, 0);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//		}
+//		else
+//		{
+//			//get the last aircraft in sequence
+//			CTOTData &end = *(m_sequence_OMDW.end() - 1);
+//			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			//assign at earliest 30 minutes after now 
+//			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//
+//		}
+//
+//		m_sequence_OMDW.push_back(temp);
+//		std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
+//		if (asap)
+//		{
+//			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMDW.at(ind - 1));
+//			else recalculateCTOT(*(m_sequence_OMDW.begin()));
+//
+//		}
+//	}
+//	if (dep == "OMAA")
+//	{
+//		if (m_sequence_OMAA.empty() || asap)
+//		{
+//
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			ctot = time + CTimeSpan(0, 0, 30, 0);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//		}
+//		else
+//		{
+//			//get the last aircraft in sequence
+//			CTOTData &end = *(m_sequence_OMAA.end() - 1);
+//			CTimeSpan increment = getIncrement(end.flightplan, flightplan);
+//			temp.flightplan = flightplan;
+//			temp.sequence = -1;
+//			//assign at earliest 30 minutes after now 
+//			ctot = std::max(time + CTimeSpan(0, 0, 30, 0), end.CTOT + increment);
+//			tobt = ctot - taxitime;
+//			temp.CTOT = ctot;
+//			temp.TOBT = tobt;
+//
+//
+//		}
+//
+//		m_sequence_OMAA.push_back(temp);
+//		std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
+//		if (asap)
+//		{
+//			if (int ind = _SelectAcIndex(temp.flightplan) > 0) recalculateCTOT(m_sequence_OMAA.at(ind - 1));
+//			else recalculateCTOT(*(m_sequence_OMAA.begin()));
+//
+//		}
+//	}
+//}
+//void CGMPHelper::updateListOMDB()
+//{
+//	//some housekeeping 
+//	for (CTOTData i : m_sequence_OMDB)
+//	{
+//		//add all aircraft in sequence to the euroscope list
+//		m_TOSequenceList.AddFpToTheList(i.flightplan);
+//	}
+//	for (CTOTData i : m_sequence_OMDB)
+//	{
+//		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
+//		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
+//		bool found = false;
+//		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
+//		while (temp.IsValid() && !found)
+//		{
+//			if (temp.GetCallsign() == i.flightplan.GetCallsign())
+//			{
+//				found = true;
+//				break;
+//			}
+//			temp = FlightPlanSelectNext(temp);
+//		}
+//		if (!found)
+//		{
+//			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
+//			m_sequence_OMDB.erase(std::remove(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), m_sequence_OMDB.at(_SelectAcIndex(i.flightplan))), m_sequence_OMDB.end());
+//			continue;
+//		}
+//		
+//		
+//		//if any aircraft takes off remove it automatically
+//		auto fp = i.flightplan;
+//		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
+//		auto cad = fp.GetFlightPlanData();
+//		std::string remarks = cad.GetRemarks();
+//		const char* test = NULL;
+//		test = strstr(remarks.c_str(), "/CTOT");
+//		if (rt.GetGS() > 80||!test)
+//		{
+//			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
+//			cad.SetRemarks(remarks.c_str());
+//			cad.AmendFlightPlan();
+//			m_TOSequenceList.RemoveFpFromTheList(fp);
+//			m_sequence_OMDB.erase(std::remove(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), m_sequence_OMDB.at(_SelectAcIndex(fp))), m_sequence_OMDB.end());
+//		}
+//	}
+//	std::sort(m_sequence_OMDB.begin(), m_sequence_OMDB.end());
+//	for (CTOTData &i : m_sequence_OMDB)
+//	{
+//		//get the number in sequence for everyone
+//		i.sequence = _SelectAcIndex(i.flightplan) + 1;
+//	}
+//	if (m_sequence_OMDB.empty())
+//	{
+//		return;
+//	}
+//	recalculateCTOT(*m_sequence_OMDB.begin());
+//}
+//void CGMPHelper::updateListOMSJ()
+//{
+//	//some housekeeping 
+//	for (CTOTData i : m_sequence_OMSJ)
+//	{
+//		//add all aircraft in sequence to the euroscope list
+//		m_TOSequenceList.AddFpToTheList(i.flightplan);
+//	}
+//	for (CTOTData i : m_sequence_OMSJ)
+//	{
+//		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
+//		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
+//		bool found = false;
+//		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
+//		while (temp.IsValid() && !found)
+//		{
+//			if (temp.GetCallsign() == i.flightplan.GetCallsign())
+//			{
+//				found = true;
+//				break;
+//			}
+//			temp = FlightPlanSelectNext(temp);
+//		}
+//		if (!found)
+//		{
+//			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
+//			m_sequence_OMSJ.erase(std::remove(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), m_sequence_OMSJ.at(_SelectAcIndex(i.flightplan))), m_sequence_OMSJ.end());
+//			continue;
+//		}
+//
+//
+//		//if any aircraft takes off remove it automatically
+//		auto fp = i.flightplan;
+//		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
+//		auto cad = fp.GetFlightPlanData();
+//		std::string remarks = cad.GetRemarks();
+//		const char* test = NULL;
+//		test = strstr(remarks.c_str(), "/CTOT");
+//		if (rt.GetGS() > 80 || !test)
+//		{
+//			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
+//			cad.SetRemarks(remarks.c_str());
+//			cad.AmendFlightPlan();
+//			m_TOSequenceList.RemoveFpFromTheList(fp);
+//			m_sequence_OMSJ.erase(std::remove(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), m_sequence_OMSJ.at(_SelectAcIndex(fp))), m_sequence_OMSJ.end());
+//		}
+//	}
+//	std::sort(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end());
+//	for (CTOTData &i : m_sequence_OMSJ)
+//	{
+//		//get the number in sequence for everyone
+//		i.sequence = _SelectAcIndex(i.flightplan) + 1;
+//	}
+//	if (m_sequence_OMSJ.empty())
+//	{
+//		return;
+//	}
+//	recalculateCTOT(*m_sequence_OMSJ.begin());
+//}
+//void CGMPHelper::updateListOMDW()
+//{
+//	//some housekeeping 
+//	for (CTOTData i : m_sequence_OMDW)
+//	{
+//		//add all aircraft in sequence to the euroscope list
+//		m_TOSequenceList.AddFpToTheList(i.flightplan);
+//	}
+//	for (CTOTData i : m_sequence_OMDW)
+//	{
+//		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
+//		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
+//		bool found = false;
+//		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
+//		while (temp.IsValid() && !found)
+//		{
+//			if (temp.GetCallsign() == i.flightplan.GetCallsign())
+//			{
+//				found = true;
+//				break;
+//			}
+//			temp = FlightPlanSelectNext(temp);
+//		}
+//		if (!found)
+//		{
+//			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
+//			m_sequence_OMDW.erase(std::remove(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), m_sequence_OMDW.at(_SelectAcIndex(i.flightplan))), m_sequence_OMDW.end());
+//			continue;
+//		}
+//
+//
+//		//if any aircraft takes off remove it automatically
+//		auto fp = i.flightplan;
+//		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
+//		auto cad = fp.GetFlightPlanData();
+//		std::string remarks = cad.GetRemarks();
+//		const char* test = NULL;
+//		test = strstr(remarks.c_str(), "/CTOT");
+//		if (rt.GetGS() > 80 || !test)
+//		{
+//			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
+//			cad.SetRemarks(remarks.c_str());
+//			cad.AmendFlightPlan();
+//			m_TOSequenceList.RemoveFpFromTheList(fp);
+//			m_sequence_OMDW.erase(std::remove(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), m_sequence_OMDW.at(_SelectAcIndex(fp))), m_sequence_OMDW.end());
+//		}
+//	}
+//	std::sort(m_sequence_OMDW.begin(), m_sequence_OMDW.end());
+//	for (CTOTData &i : m_sequence_OMDW)
+//	{
+//		//get the number in sequence for everyone
+//		i.sequence = _SelectAcIndex(i.flightplan) + 1;
+//	}
+//	if (m_sequence_OMDW.empty())
+//	{
+//		return;
+//	}
+//	recalculateCTOT(*m_sequence_OMDW.begin());
+//}
+//void CGMPHelper::updateListOMAA()
+//{
+//	//some housekeeping 
+//	for (CTOTData i : m_sequence_OMAA)
+//	{
+//		//add all aircraft in sequence to the euroscope list
+//		m_TOSequenceList.AddFpToTheList(i.flightplan);
+//	}
+//	for (CTOTData i : m_sequence_OMAA)
+//	{
+//		EuroScopePlugIn::CFlightPlan first = FlightPlanSelectFirst();
+//		EuroScopePlugIn::CFlightPlan temp = FlightPlanSelectNext(first);
+//		bool found = false;
+//		if (first.GetCallsign() == i.flightplan.GetCallsign()) found = true;
+//		while (temp.IsValid() && !found)
+//		{
+//			if (temp.GetCallsign() == i.flightplan.GetCallsign())
+//			{
+//				found = true;
+//				break;
+//			}
+//			temp = FlightPlanSelectNext(temp);
+//		}
+//		if (!found)
+//		{
+//			m_TOSequenceList.RemoveFpFromTheList(i.flightplan);
+//			m_sequence_OMAA.erase(std::remove(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), m_sequence_OMAA.at(_SelectAcIndex(i.flightplan))), m_sequence_OMAA.end());
+//			continue;
+//		}
+//
+//
+//		//if any aircraft takes off remove it automatically
+//		auto fp = i.flightplan;
+//		EuroScopePlugIn::CRadarTarget rt = fp.GetCorrelatedRadarTarget();
+//		auto cad = fp.GetFlightPlanData();
+//		std::string remarks = cad.GetRemarks();
+//		const char* test = NULL;
+//		test = strstr(remarks.c_str(), "/CTOT");
+//		if (rt.GetGS() > 80 || !test)
+//		{
+//			remarks = std::regex_replace(remarks, std::regex("\\/CTOT"), "");
+//			cad.SetRemarks(remarks.c_str());
+//			cad.AmendFlightPlan();
+//			m_TOSequenceList.RemoveFpFromTheList(fp);
+//			m_sequence_OMAA.erase(std::remove(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), m_sequence_OMAA.at(_SelectAcIndex(fp))), m_sequence_OMAA.end());
+//		}
+//	}
+//	std::sort(m_sequence_OMAA.begin(), m_sequence_OMAA.end());
+//	for (CTOTData &i : m_sequence_OMAA)
+//	{
+//		//get the number in sequence for everyone
+//		i.sequence = _SelectAcIndex(i.flightplan) + 1;
+//	}
+//	if (m_sequence_OMAA.empty())
+//	{
+//		return;
+//	}
+//	recalculateCTOT(*m_sequence_OMAA.begin());
+//}
+//
+//void CGMPHelper::recalculateCTOT(CTOTData inserted)
+////recalculates the CTOT for each flightplan in sequence following and inculding "inserted"
+//{
+//	std::string dep = inserted.flightplan.GetFlightPlanData().GetOrigin();
+//	//get the number in sequence for our inserted fp
+//	if (dep == "OMDB")
+//	{
+//		auto pos = std::find(m_sequence_OMDB.begin(), m_sequence_OMDB.end(), inserted);
+//		//safeguard if not found due to whatever 
+//		if (pos == m_sequence_OMDB.end())
+//		{
+//			return;
+//		}
+//		//iterate over the sequence starting from "inserted"
+//		for (auto &it = pos; it != m_sequence_OMDB.end() - 1; it++)
+//		{
+//			CTime curr = CTime::GetCurrentTime();
+//			CTOTData temp1 = *it;
+//			CString test = temp1.flightplan.GetCallsign();
+//			CTOTData &temp2 = *(it + 1);
+//			CString test2 = temp2.flightplan.GetCallsign();
+//			if (temp2.manual) continue;
+//			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
+//			temp2.CTOT = std::max(temp2.CTOT,temp1.CTOT + inc);
+//			temp2.TOBT = temp2.CTOT - taxitime;
+//		}
+//	}
+//	if (dep == "OMSJ")
+//	{
+//		auto pos = std::find(m_sequence_OMSJ.begin(), m_sequence_OMSJ.end(), inserted);
+//		//safeguard if not found due to whatever 
+//		if (pos == m_sequence_OMSJ.end())
+//		{
+//			return;
+//		}
+//		//iterate over the sequence starting from "inserted"
+//		for (auto &it = pos; it != m_sequence_OMSJ.end() - 1; it++)
+//		{
+//			CTime curr = CTime::GetCurrentTime();
+//			CTOTData temp1 = *it;
+//			CString test = temp1.flightplan.GetCallsign();
+//			CTOTData &temp2 = *(it + 1);
+//			CString test2 = temp2.flightplan.GetCallsign();
+//			if (temp2.manual) continue;
+//			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
+//			temp2.CTOT = std::max(temp2.CTOT, temp1.CTOT + inc);
+//			temp2.TOBT = temp2.CTOT - taxitime;
+//		}
+//	}
+//	if (dep == "OMDW")
+//	{
+//		auto pos = std::find(m_sequence_OMDW.begin(), m_sequence_OMDW.end(), inserted);
+//		//safeguard if not found due to whatever 
+//		if (pos == m_sequence_OMDW.end())
+//		{
+//			return;
+//		}
+//		//iterate over the sequence starting from "inserted"
+//		for (auto &it = pos; it != m_sequence_OMDW.end() - 1; it++)
+//		{
+//			CTime curr = CTime::GetCurrentTime();
+//			CTOTData temp1 = *it;
+//			CString test = temp1.flightplan.GetCallsign();
+//			CTOTData &temp2 = *(it + 1);
+//			CString test2 = temp2.flightplan.GetCallsign();
+//			if (temp2.manual) continue;
+//			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
+//			temp2.CTOT = std::max(temp2.CTOT, temp1.CTOT + inc);
+//			temp2.TOBT = temp2.CTOT - taxitime;
+//		}
+//	}
+//	if (dep == "OMAA")
+//	{
+//		auto pos = std::find(m_sequence_OMAA.begin(), m_sequence_OMAA.end(), inserted);
+//		//safeguard if not found due to whatever 
+//		if (pos == m_sequence_OMAA.end())
+//		{
+//			return;
+//		}
+//		//iterate over the sequence starting from "inserted"
+//		for (auto &it = pos; it != m_sequence_OMAA.end() - 1; it++)
+//		{
+//			CTime curr = CTime::GetCurrentTime();
+//			CTOTData temp1 = *it;
+//			CString test = temp1.flightplan.GetCallsign();
+//			CTOTData &temp2 = *(it + 1);
+//			CString test2 = temp2.flightplan.GetCallsign();
+//			if (temp2.manual) continue;
+//			CTimeSpan inc = getIncrement(temp1.flightplan, temp2.flightplan);
+//			temp2.CTOT = std::max(temp2.CTOT, temp1.CTOT + inc);
+//			temp2.TOBT = temp2.CTOT - taxitime;
+//		}
+//	}
+//}
+//CTimeSpan CGMPHelper::getIncrement(EuroScopePlugIn::CFlightPlan fp1, EuroScopePlugIn::CFlightPlan fp2)
+////returns the required difference in CTOT when fp2 is trailing fp1
+//{
+//	CTimeSpan increment;
+//	CString sid1 = fp1.GetFlightPlanData().GetSidName();
+//	CString sid2 = fp2.GetFlightPlanData().GetSidName();
+//	char wtc1 = fp1.GetFlightPlanData().GetAircraftWtc();
+//	char wtc2 = fp2.GetFlightPlanData().GetAircraftWtc();
+//	switch (wtc1)
+//	{
+//	case 'J':
+//	{
+//		if (wtc2 == 'H')
+//		{
+//			increment = CTimeSpan(0, 0, 2, 0);
+//		}
+//		if (wtc2 == 'M' || wtc2 == 'L')
+//		{
+//			increment = CTimeSpan(0, 0, 3, 0);
+//		}
+//		break;
+//	}
+//	case 'H':
+//	{
+//		if (wtc2 == 'M' || wtc2 == 'L')
+//		{
+//			increment = CTimeSpan(0, 0, 2, 0);
+//		}
+//		else {
+//
+//		}
+//		break;
+//	}
+//	case 'M':
+//	{
+//		if (wtc2 == 'L')
+//		{
+//			increment = CTimeSpan(0, 0, 2, 0);
+//		}
+//		break;
+//	}
+//	}
+//	if (increment == NULL)
+//	{
+//		if (sid1 != sid2)
+//		{
+//			//RRSM
+//			increment = CTimeSpan(0, 0, 1, 0);
+//		}
+//		else
+//			increment = CTimeSpan(0, 0, 2, 0);
+//	}
+//	if (sid1 == sid2 && (strstr(sid1, "ANVIX") || strstr(sid1, "IVURO")))
+//		increment = std::max(increment, CTimeSpan(0, 0, 3, 0));
+//
+//	return increment;
+//}
+//
 
 
 

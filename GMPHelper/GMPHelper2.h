@@ -257,10 +257,10 @@ public:
 
 
 
-	/*virtual void    OnFunctionCall(int FunctionId,
+	virtual void    OnFunctionCall(int FunctionId,
 			const char * sItemString,
 			POINT Pt,
-			RECT Area);*/
+			RECT Area);
 
 	/*This function overrides a Euroscope function. It handles the user interface interaction. So it shows the popup menu on left click on the respective TAG fields and so on 
 	  detailed info on the input and output values can be found in the EuroScopePlugIn.h header
