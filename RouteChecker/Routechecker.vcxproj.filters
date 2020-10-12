@@ -15,21 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GMPHelper.cpp">
+    <ClCompile Include="RouteChecker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GMPHelper2.cpp">
+    <ClCompile Include="RouteChecker2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GMPHelper.def">
+    <None Include="RouteChecker.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="res\GMPHelper.rc2">
+    <None Include="res\RouteChecker.rc2">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\omaeroutes.csv" />
@@ -44,13 +44,10 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GMPHelper.h">
+    <ClInclude Include="RouteChecker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GMPHelper2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource1.h">
@@ -62,9 +59,12 @@
     <ClInclude Include="I:\Downloads\loguru-master\loguru.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RouteChecker2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="GMPHelper.rc">
+    <ResourceCompile Include="RouteChecker.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

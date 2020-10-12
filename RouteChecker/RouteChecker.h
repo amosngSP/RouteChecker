@@ -8,7 +8,7 @@
 #endif
 
 #include "resource.h"		// main symbols
-#include "GMPHelper2.h"
+#include "RouteChecker2.h"
 
 
 // CGMPHelperApp

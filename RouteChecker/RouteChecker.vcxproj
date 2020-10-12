@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{9BD21CE9-C035-4E95-8C9A-6661B2CBFCF6}</ProjectGuid>
     <Keyword>MFCDLLProj</Keyword>
-    <RootNamespace>GMPHelper</RootNamespace>
+    <RootNamespace>RouteChecker</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -45,7 +45,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -78,7 +78,7 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -101,7 +101,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <ModuleDefinitionFile>.\GMPHelper.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\RouteChecker.def</ModuleDefinitionFile>
       <AdditionalDependencies>C:\Program Files (x86)\EuroScope\PlugInEnvironment\EuroScopePlugInDll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
@@ -122,10 +122,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\EuroScope\PlugInEnvironment\</AdditionalIncludeDirectories>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <ModuleDefinitionFile>.\GMPHelper.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\EuroScope\PlugInEnvironment\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>EuroScopePlugInDll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -136,6 +139,9 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -153,7 +159,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>.\GMPHelper.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\RouteChecker.def</ModuleDefinitionFile>
       <AdditionalDependencies>C:\Program Files (x86)\EuroScope\PlugInEnvironment\EuroScopePlugInDll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
@@ -176,12 +182,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\EuroScope\PlugInEnvironment;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>.\GMPHelper.def</ModuleDefinitionFile>
+      <AdditionalDependencies>C:\Program Files (x86)\EuroScope\PlugInEnvironment\EuroScopePlugInDll.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -194,8 +201,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GMPHelper.cpp" />
-    <ClCompile Include="GMPHelper2.cpp" />
+    <ClCompile Include="RouteChecker.cpp" />
+    <ClCompile Include="RouteChecker2.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -204,14 +211,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GMPHelper.def" />
-    <None Include="res\GMPHelper.rc2" />
+    <None Include="RouteChecker.def" />
+    <None Include="res\RouteChecker.rc2" />
     <None Include="res\omaeroutes.csv" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\GMPHelper2.h" />
+    <ClInclude Include="RouteChecker2.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="GMPHelper.h" />
+    <ClInclude Include="RouteChecker.h" />
     <ClInclude Include="I:\Downloads\loguru-master\loguru.hpp" />
     <ClInclude Include="routing.h" />
     <ClInclude Include="pch.h" />
@@ -220,7 +227,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="GMPHelper.rc" />
+    <ResourceCompile Include="RouteChecker.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
