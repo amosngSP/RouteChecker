@@ -61,12 +61,12 @@ CGMPHelper::CGMPHelper(void)
 		// Return or however you want to handle an error.
 	}
 	std::string dir(path);
-	std::string filename("GMPHelper.dll");
+	std::string filename("RouteChecker.dll");
 	size_t pos = dir.find(filename);
 	dir.replace(pos, filename.length(), "");
-	loguru::add_file("GMPHelper.log", loguru::Append, loguru::Verbosity_INFO);
+	loguru::add_file("RouteChecker.log", loguru::Append, loguru::Verbosity_INFO);
 	char logpath[1024];
-	loguru::set_thread_name("GMPHelper");
+	loguru::set_thread_name("RouteChecker");
 	loguru::suggest_log_path(dir.c_str(), logpath, sizeof(logpath));
 	loguru::add_file(logpath, loguru::FileMode::Truncate, loguru::Verbosity_INFO);
 	LOG_F(INFO, "We successfully started routeChecker. Great Success!");
