@@ -28,44 +28,84 @@ public:
 	bool isCruiseValid(int Flightlevel)
 	{
 		bool returnval = false;
-		
-		if (this->mLevelR.empty())
+		if (Flightlevel > 40000)
 		{
-			if (this->mEvenOdd == "ODD")
+			if (this->mLevelR.empty())
 			{
-				if ((Flightlevel / 1000) % 2 == 1) return true;
-				else return false;
-			}
-			if (this->mEvenOdd == "EVEN")
-			{
-				if ((Flightlevel / 1000) % 2 == 0) return true;
-				else return false;
-			}
-		}
-		else
-		{
-			
-			if (this->mLevelR.at(0) == '<')
-			{
-				std::string restr = this->mLevelR.substr(1, 3);
 				if (this->mEvenOdd == "ODD")
 				{
-					if (((Flightlevel / 1000) % 2 == 1) && Flightlevel <= std::stoi(restr)) return true;
+					if ((Flightlevel / 1000) % 4 == 1) return true;
 					else return false;
 				}
 				if (this->mEvenOdd == "EVEN")
 				{
-					if (((Flightlevel / 1000) % 2 == 0) && Flightlevel <= std::stoi(restr)*100) return true;
+					if ((Flightlevel / 1000) % 4 == 3) return true;
 					else return false;
 				}
 			}
 			else
 			{
-				int restr = std::stoi(this->mLevelR);
-				return (Flightlevel == restr*100);
+
+				if (this->mLevelR.at(0) == '<')
+				{
+					std::string restr = this->mLevelR.substr(1, 3);
+					if (this->mEvenOdd == "ODD")
+					{
+						if (((Flightlevel / 1000) % 4 == 1) && Flightlevel <= std::stoi(restr)) return true;
+						else return false;
+					}
+					if (this->mEvenOdd == "EVEN")
+					{
+						if (((Flightlevel / 1000) % 4 == 3) && Flightlevel <= std::stoi(restr) * 100) return true;
+						else return false;
+					}
+				}
+				else
+				{
+					int restr = std::stoi(this->mLevelR);
+					return (Flightlevel == restr * 100);
+				}
 			}
 		}
-		return returnval;
+		else {
+			if (this->mLevelR.empty())
+			{
+				if (this->mEvenOdd == "ODD")
+				{
+					if ((Flightlevel / 1000) % 2 == 1) return true;
+					else return false;
+				}
+				if (this->mEvenOdd == "EVEN")
+				{
+					if ((Flightlevel / 1000) % 2 == 0) return true;
+					else return false;
+				}
+			}
+			else
+			{
+
+				if (this->mLevelR.at(0) == '<')
+				{
+					std::string restr = this->mLevelR.substr(1, 3);
+					if (this->mEvenOdd == "ODD")
+					{
+						if (((Flightlevel / 1000) % 2 == 1) && Flightlevel <= std::stoi(restr)) return true;
+						else return false;
+					}
+					if (this->mEvenOdd == "EVEN")
+					{
+						if (((Flightlevel / 1000) % 2 == 0) && Flightlevel <= std::stoi(restr) * 100) return true;
+						else return false;
+					}
+				}
+				else
+				{
+					int restr = std::stoi(this->mLevelR);
+					return (Flightlevel == restr * 100);
+				}
+			}
+			return returnval;
+		}
 	}
 	bool isRouteValid(std::string Route)
 	{
