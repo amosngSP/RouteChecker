@@ -197,6 +197,7 @@ void CGMPHelper::OnGetTagItem(EuroScopePlugIn::CFlightPlan FlightPlan,
 		auto dt = data.at(icaodep).getDatafromICAO(icaodest);
 		bool cruisevalid = false;
 		bool routevalid = false;
+		*pColorCode = EuroScopePlugIn::TAG_COLOR_EMERGENCY;
 		for (auto d : dt) {
 			std::string tmp = fpdata.GetRoute();
 			std::regex rule("\\/(.+?)(\\\s+?)");
@@ -215,6 +216,7 @@ void CGMPHelper::OnGetTagItem(EuroScopePlugIn::CFlightPlan FlightPlan,
 				}
 				else {
 					strcpy(sItemString, "L");
+					return;
 				}
 
 			}
@@ -222,7 +224,8 @@ void CGMPHelper::OnGetTagItem(EuroScopePlugIn::CFlightPlan FlightPlan,
 			if (routevalid && cruisevalid)
 			{
 				strcpy(sItemString, "");
-				break;
+				return;
+				
 			}
 				
 		}
@@ -233,7 +236,8 @@ void CGMPHelper::OnGetTagItem(EuroScopePlugIn::CFlightPlan FlightPlan,
 			strcpy(sItemString, "X");
 		}
 		
-		*pColorCode = EuroScopePlugIn::TAG_COLOR_EMERGENCY;
+		
+		return;
 	}
 	}
 }
