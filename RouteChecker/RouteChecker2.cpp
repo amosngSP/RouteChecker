@@ -219,6 +219,8 @@ void CGMPHelper::OnGetTagItem(EuroScopePlugIn::CFlightPlan FlightPlan,
 
 			}
 			cruisevalid = d.isCruiseValid(FlightPlan.GetFinalAltitude());
+			if (routevalid && cruisevalid)
+				break;
 		}
 		
 		if (cruisevalid && !routevalid) strcpy(sItemString, "R");
