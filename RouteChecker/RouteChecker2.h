@@ -135,12 +135,12 @@ public:
 		while (ss >> buf)
 			tokens.push_back(buf);
 		auto tokenscopy = tokens;
-		RemoveDuplicatesInVector(tokens);
+		tokens = RemoveDuplicatesInVector(tokens);
 		for (int i = 0; i < tokens.size(); i++)
 		{
 			if (tokens.at(i) != tokenscopy.at(i))
 			{
-				tokens.erase(std::remove(tokens.begin(), tokens.end(), tokens.at(i-1)), tokens.end());
+				tokens.erase(std::remove(tokens.begin(), tokens.end(), tokens.at(i)), tokens.end());
 				break;
 			}
 		}
