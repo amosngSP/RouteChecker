@@ -136,15 +136,6 @@ public:
 			tokens.push_back(buf);
 		auto tokenscopy = tokens;
 		tokens = RemoveDuplicatesInVector(tokens);
-		for (int i = 0; i < tokens.size(); i++)
-		{
-			if (tokens.at(i) != tokenscopy.at(i))
-			{
-				tokens.erase(std::remove(tokens.begin(), tokens.end(), tokens.at(i)), tokens.end());
-				break;
-			}
-		}
-		tokens.shrink_to_fit();
 		std::string result;
 		for (auto temp : tokens)
 		{
@@ -167,7 +158,11 @@ public:
 			{
 				auto check1 = std::find(vec.begin(), vec.end(), *check);
 				if (check1 != vec.end() && *(check1 + 2) == *check)
-					vec.erase(std::remove(vec.begin(),check1+1,*check1));
+				{
+					vec.erase(std::remove(vec.begin(), check1 + 2, *(check1 + 1)));
+					auto check2 = std::find(vec.begin(), vec.end(), *check);
+					vec.erase(std::remove(vec.begin(), check2 + 1, *check2));
+				}
 			}
 		}
 		vec.shrink_to_fit();

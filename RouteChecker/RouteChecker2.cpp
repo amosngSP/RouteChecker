@@ -27,6 +27,7 @@ const	int		TAG_ITEM_ROUTE_VALID = 123123;
 
 
 const   int     TAG_FUNC_ROUTING = 15;
+const int TAG_FUNC_BEST_ROUTE = 16;
 
 
 
@@ -301,6 +302,47 @@ inline void CGMPHelper::OnFunctionCall(int FunctionId,	const char * sItemString,
 			routing += " cruise level.";
 			DisplayUserMessage(handlername.c_str(), "", routing.c_str(), true, true, true, true, true);
 		}
+	}
+	case TAG_FUNC_BEST_ROUTE:
+	{
+		std::string handlername = "Best Route(s) for ";
+		handlername += fp.GetCallsign();
+		std::string dest = fpdata.GetDestination();
+		auto routes = data[fpdata.GetOrigin()].getDatafromICAO(dest);
+		if (routes.empty())
+		{
+			routes = data[fpdata.GetOrigin()].getDatafromICAO(dest.substr(0, 2));
+			if (routes.empty())
+			{
+				routes = data[fpdata.GetOrigin()].getDatafromICAO(dest.substr(0, 1));
+				if (routes.empty())
+					DisplayUserMessage(handlername.c_str(), "", "No best route found", true, true, true, true, true);
+			}
+
+		}
+		std::string sid = fpdata.GetSidName();
+		for (auto temp : routes)
+		{
+			std::string routing = "Valid routes to ";
+			routing += dest;
+			routing += "using ";
+			
+			routing +=
+			routing += temp.mRoute;
+			routing += ". Flightlevel is ";
+			if (temp.mLevelR.empty())
+				routing += "not restricted";
+			else
+			{
+				routing += "restricted to ";
+				routing += temp.mLevelR;
+			}
+			routing += ". The direction of flight dictates an ";
+			routing += temp.mEvenOdd;
+			routing += " cruise level.";
+			DisplayUserMessage(handlername.c_str(), "", routing.c_str(), true, true, true, true, true);
+		}
+		
 	}
 
 	}// switch by the function ID
