@@ -149,6 +149,7 @@ public:
 	{
 		std::set<std::string> values;
 		//vec.erase(std::remove_if(vec.begin(), vec.end(), [&](const std::string & value) { return !values.insert(value).second; }), vec.end());
+		std::vector<std::string> vec2 = vec;
 		for (auto value: vec)
 		{
 			auto check = values.find(value);
@@ -156,17 +157,17 @@ public:
 				values.insert(value);
 			else
 			{
-				auto check1 = std::find(vec.begin(), vec.end(), *check);
-				if (check1 != vec.end() && *(check1 + 2) == *check)
+				auto check1 = std::find(vec2.begin(), vec2.end(), *check);
+				if (check1 != vec2.end() && *(check1 + 2) == *check)
 				{
-					vec.erase(std::remove(vec.begin(), check1 + 2, *(check1 + 1)));
-					auto check2 = std::find(vec.begin(), vec.end(), *check);
-					vec.erase(std::remove(vec.begin(), check2 + 1, *check2));
+					vec2.erase(std::remove(vec2.begin(), check1 + 2, *(check1 + 1)));
+					auto check2 = std::find(vec2.begin(), vec2.end(), *check);
+					vec2.erase(std::remove(vec2.begin(), check2 + 1, *check2));
 				}
 			}
 		}
-		vec.shrink_to_fit();
-		return vec;
+		vec2.shrink_to_fit();
+		return vec2;
 	}
 	std::string findAndReplaceAll(std::string data, std::string toSearch, std::string replaceStr)
 	{
