@@ -89,7 +89,7 @@ public:
 					std::string restr = this->mLevelR.substr(1, 3);
 					if (this->mEvenOdd == "ODD")
 					{
-						if (((Flightlevel / 1000) % 2 == 1) && Flightlevel <= std::stoi(restr)) return true;
+						if (((Flightlevel / 1000) % 2 == 1) && Flightlevel <= std::stoi(restr) * 100) return true;
 						else return false;
 					}
 					if (this->mEvenOdd == "EVEN")
