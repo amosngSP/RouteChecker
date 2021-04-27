@@ -17,7 +17,7 @@
 
 
 #define MY_PLUGIN_NAME      "RouteChecker for VATSIM"
-#define MY_PLUGIN_VERSION   "1.0"
+#define MY_PLUGIN_VERSION   "1.1"
 #define MY_PLUGIN_DEVELOPER "Nils Dornbusch"
 #define MY_PLUGIN_COPYRIGHT "Free to be distributed as source code"
 #define MY_PLUGIN_VIEW      ""
@@ -130,7 +130,16 @@ void CGMPHelper::OnGetTagItem(EuroScopePlugIn::CFlightPlan FlightPlan,
 	
 	case TAG_ITEM_ROUTE_VALID:
 	{
+
 		auto fpdata = FlightPlan.GetFlightPlanData();
+		if (FlightPlan.GetClearenceFlag())
+		{
+			std::string logstring = "Aircraft ";
+			logstring += FlightPlan.GetCallsign();
+			logstring += "is skipped because Clearance flag is set.";
+			LOG_F(INFO, logstring.c_str());
+			return;
+		}
 		std::string icaodep = fpdata.GetOrigin();
 		if (data.find(icaodep) == data.end())
 		{
